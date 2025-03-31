@@ -974,7 +974,6 @@ app.get("/api/student/dormitories", (req, res) => {
     });
 });
 
-
 // ✅ ดึงรายละเอียดหอพัก (รวมประเภท, หมวดหมู่, สิ่งอำนวยความสะดวก)
 app.get("/api/student/dormitories/:id", (req, res) => {
     const { id } = req.params;
@@ -1288,6 +1287,27 @@ app.post("/api/reset-password", async (req, res) => {
         res.status(400).json({ error: "❌ ลิงก์หมดอายุหรือไม่ถูกต้อง" });
     }
 });
+
+// ✅ API สำหรับดึงข้อมูลผู้ใช้ตาม ID
+app.get("/api/user/:id", (req, res) => {
+    const userId = req.params.id;
+
+    const sql = "SELECT User_ID, Username, FName, LName, Email, Phone FROM user WHERE User_ID = ?";
+
+    db.query(sql, [userId], (err, result) => {
+        if (err) {
+            console.error("❌ Error fetching user:", err);
+            return res.status(500).json({ error: "เกิดข้อผิดพลาดในการดึงข้อมูลผู้ใช้" });
+        }
+
+        if (result.length === 0) {
+            return res.status(404).json({ error: "ไม่พบข้อมูลผู้ใช้" });
+        }
+
+        res.json(result[0]);
+    });
+});
+
 
 // ✅ Start Server
 app.listen(3000, () => {
